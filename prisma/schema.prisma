@@ -1,0 +1,63 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Progression {
+  id          Int          @id @default(autoincrement())
+  user_id     Int
+  tutorial_id Int
+  startedAt   DateTime?
+  completed   Boolean      @default(false)
+
+  utilisateur Utilisateur  @relation(fields: [user_id], references: [id])
+  tutoriel    Tutoriel     @relation(fields: [tutorial_id], references: [id])
+
+  @@map("progression")
+}
+
+model Utilisateur {
+  id          Int           @id @default(autoincrement())
+  email       String
+  password    String
+  username    String
+  role        String
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  progressions Progression[]
+
+  @@map("utilisateur")
+}
+
+model Tutoriel {
+  id          Int           @id @default(autoincrement())
+  title       String
+  slug        String
+  description String        @db.Text
+  contenu     String        @db.Text
+  category    String
+  published   Boolean       @default(false)
+  imageurl    String
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  progressions Progression[]
+  categorie    Categorie     @relation(fields: [category], references: [name])
+
+  @@map("tutoriel")
+}
+
+model Categorie {
+  id        Int        @id @default(autoincrement())
+  name      String     @unique
+  slug      String
+
+  tutoriels Tutoriel[]
+
+  @@map("categorie")
+}
