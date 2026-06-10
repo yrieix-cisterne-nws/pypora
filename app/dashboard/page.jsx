@@ -20,6 +20,9 @@ export default function Dashboard() {
                     {/*certificat card */}
                 </div>
             </div>
+            <div>
+                <a href="/dashboard/settings">Paramètres du compte</a>
+            </div>
         </>
     )
 }
