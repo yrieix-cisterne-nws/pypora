@@ -10,7 +10,7 @@ model Progression {
   id          Int          @id @default(autoincrement())
   user_id     Int
   tutorial_id Int
-  startedAt   DateTime?
+  startedAt   DateTime
   completed   Boolean      @default(false)
 
   utilisateur Utilisateur  @relation(fields: [user_id], references: [id])
