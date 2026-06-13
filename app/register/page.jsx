@@ -6,7 +6,7 @@ export default function Register() {
   const [showConfirm, setShowConfirm] = useState(false);
 
   return (
-    <div className="min-h-screen bg-violet-50 flex flex-col items-center px-4 pt-16 pb-12">
+    <div className="min-h-screen flex flex-col items-center px-4 pt-16 pb-12">
       <div className="text-center mb-10">
         <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">
           Créer un compte

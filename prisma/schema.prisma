@@ -21,7 +21,7 @@ model Progression {
 
 model Utilisateur {
   id          Int           @id @default(autoincrement())
-  email       String
+  email       String        @unique
   password    String
   username    String
   role        String
