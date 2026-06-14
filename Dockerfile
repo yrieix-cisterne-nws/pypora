@@ -15,10 +15,11 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# URL fictive : les pages sont dynamiques, aucune requête DB n'est faite au build
-ENV DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy"
 ENV NEXT_TELEMETRY_DISABLED=1
 
+# ARG et non ENV : disponibles pendant le RUN mais pas gravés dans l'image finale
+ARG DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy"
+ARG JWT_SECRET="dummy_secret_for_build_only"
 RUN npm run build
 
 # ── 3. Runner ─────────────────────────────────────────────────────────────────
