@@ -30,10 +30,10 @@ export default function AdminTutorielRow({ tutoriel }) {
 
   return (
     <tr className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
-      <td className="px-4 py-3 text-sm text-gray-900 font-medium max-w-xs truncate">
+      <td className="px-4 py-3 text-sm text-gray-900 font-medium overflow-hidden truncate">
         {tutoriel.title}
       </td>
-      <td className="px-4 py-3">
+      <td className="px-4 py-3 hidden sm:table-cell">
         <span className="text-xs font-semibold text-white bg-violet-700 px-2.5 py-0.5 rounded-full">
           {tutoriel.category}
         </span>
@@ -50,7 +50,7 @@ export default function AdminTutorielRow({ tutoriel }) {
           {published ? "Publié" : "Brouillon"}
         </button>
       </td>
-      <td className="px-4 py-3 text-xs text-gray-400">
+      <td className="px-4 py-3 text-xs text-gray-400 hidden sm:table-cell">
         {new Date(tutoriel.createdAt).toLocaleDateString("fr-FR")}
       </td>
       <td className="px-4 py-3">

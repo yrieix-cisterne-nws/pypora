@@ -170,7 +170,7 @@ export default function SettingsDashboard() {
             </div>
           </div>
 
-          <div className="bg-white border border-red-200 border-l-4 border-l-red-500 rounded-2xl p-6 flex items-start justify-between gap-4">
+          <div className="bg-white border border-red-200 border-l-4 border-l-red-500 rounded-2xl p-6 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
             <div>
               <h2 className="flex items-center gap-2 text-base font-semibold text-red-600 mb-2">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -186,7 +186,7 @@ export default function SettingsDashboard() {
             <button
               onClick={handleDeleteAccount}
               disabled={deleteLoading}
-              className="text-sm font-semibold text-red-500 hover:text-red-700 disabled:opacity-60 transition-colors shrink-0 mt-1"
+              className="text-sm font-semibold text-red-500 hover:text-red-700 disabled:opacity-60 transition-colors sm:shrink-0 sm:mt-1"
             >
               {deleteLoading ? "Suppression…" : "Supprimer le compte"}
             </button>

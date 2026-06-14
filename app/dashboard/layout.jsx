@@ -7,7 +7,7 @@ export default async function DashboardLayout({ children }) {
   if (!payload) redirect("/login");
 
   return (
-    <div className="min-h-screen bg-gray-100 flex">
+    <div className="min-h-screen bg-gray-100 flex pb-16 md:pb-0">
       <DashboardSidebar role={payload.role} />
       {children}
     </div>

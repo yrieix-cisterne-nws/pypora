@@ -7,7 +7,7 @@ export default async function AdminLayout({ children }) {
   if (!payload || payload.role !== "admin") redirect("/dashboard");
 
   return (
-    <div className="min-h-screen bg-gray-100 flex">
+    <div className="min-h-screen bg-gray-100 flex pb-16 md:pb-0">
       <AdminSidebar />
       <div className="flex-1">
         {children}

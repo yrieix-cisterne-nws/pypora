@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { getPayload } from "@/lib/auth";
 import CompleteButton from "@/components/CompleteButton";
@@ -6,6 +6,9 @@ import ContentBlock from "@/components/tutoriel/ContentBlocks";
 
 export default async function TutorielPage({ params }) {
   const { slug } = await params;
+
+  const payload = await getPayload();
+  if (!payload) redirect("/register");
 
   const tuto = await prisma.tutoriel.findFirst({
     where: { slug, published: true },
@@ -21,15 +24,10 @@ export default async function TutorielPage({ params }) {
     sections = [];
   }
 
-  const payload = await getPayload();
-
-  let initialCompleted = false;
-  if (payload) {
-    const progression = await prisma.progression.findFirst({
-      where: { user_id: payload.userId, tutorial_id: tuto.id },
-    });
-    initialCompleted = progression?.completed ?? false;
-  }
+  const progression = await prisma.progression.findFirst({
+    where: { user_id: payload.userId, tutorial_id: tuto.id },
+  });
+  const initialCompleted = progression?.completed ?? false;
 
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-8 py-10">
@@ -113,14 +111,7 @@ export default async function TutorielPage({ params }) {
           </div>
 
           <div className="mt-10 pt-6 border-t border-gray-100">
-            {payload ? (
-              <CompleteButton tutorialId={tuto.id} initialCompleted={initialCompleted} />
-            ) : (
-              <p className="text-sm text-gray-400">
-                <a href="/login" className="text-violet-600 hover:underline font-medium">Connectez-vous</a>
-                {" "}pour marquer ce tutoriel comme terminé.
-              </p>
-            )}
+            <CompleteButton tutorialId={tuto.id} initialCompleted={initialCompleted} />
           </div>
 
         </main>
