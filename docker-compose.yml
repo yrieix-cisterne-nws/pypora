@@ -30,6 +30,7 @@ services:
       - traefik
     labels:
       - "traefik.enable=true"
+      - "traefik.docker.network=traefik"
       - "traefik.http.routers.pypora.rule=Host(`${DOMAIN}`)"
       - "traefik.http.routers.pypora.entrypoints=websecure"
       - "traefik.http.routers.pypora.tls.certresolver=letsencrypt"
