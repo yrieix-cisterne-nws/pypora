@@ -1,0 +1,45 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: pypora
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d pypora"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build: .
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD}@db:5432/pypora?sslmode=disable
+      JWT_SECRET: ${JWT_SECRET}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - internal
+      - traefik
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.pypora.rule=Host(`${DOMAIN}`)"
+      - "traefik.http.routers.pypora.entrypoints=websecure"
+      - "traefik.http.routers.pypora.tls.certresolver=letsencrypt"
+      - "traefik.http.services.pypora.loadbalancer.server.port=3000"
+
+networks:
+  internal:
+    internal: true
+  traefik:
+    external: true
+
+volumes:
+  postgres_data:
