@@ -26,9 +26,10 @@ ENV NEXT_TELEMETRY_DISABLED=1
 RUN addgroup --system --gid 1001 nodejs \
  && adduser --system --uid 1001 nextjs
 
-# Installer uniquement les dépendances de production + générer le client Prisma
 COPY package.json package-lock.json* ./
 COPY prisma ./prisma/
+# prisma.config.ts fournit DATABASE_URL au CLI Prisma (db push au démarrage)
+COPY --from=builder /app/prisma.config.ts ./
 RUN npm ci --omit=dev && npx prisma generate
 
 # Copier l'app buildée
