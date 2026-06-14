@@ -36,7 +36,7 @@ model Utilisateur {
 model Tutoriel {
   id          Int           @id @default(autoincrement())
   title       String
-  slug        String
+  slug        String        @unique
   description String        @db.Text
   contenu     String        @db.Text
   category    String
@@ -54,7 +54,7 @@ model Tutoriel {
 model Categorie {
   id        Int        @id @default(autoincrement())
   name      String     @unique
-  slug      String
+  slug      String     @unique
 
   tutoriels Tutoriel[]
 

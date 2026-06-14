@@ -2,9 +2,18 @@ import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { hashPassword } from "@/lib/bcrypt"
 import { registerSchema } from "@/lib/validations/auth"
+import { checkRateLimit } from "@/lib/rateLimit"
 
 export async function POST(req: Request) {
   try {
+    const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown"
+    if (!checkRateLimit(`register:${ip}`, 5, 60_000)) {
+      return NextResponse.json(
+        { error: "Trop de tentatives. Réessayez dans une minute." },
+        { status: 429 }
+      )
+    }
+
     const body = await req.json()
     const result = registerSchema.safeParse(body)
     if (!result.success) {
@@ -13,8 +22,9 @@ export async function POST(req: Request) {
         { status: 400 }
       )
     }
-    const { username, email, password } = result.data
-    
+    const { username: rawUsername, email, password } = result.data
+    const username = rawUsername.trim()
+
     const existingUser = await prisma.utilisateur.findUnique({
       where: { email },
     })
@@ -38,7 +48,7 @@ export async function POST(req: Request) {
       { message: "Compte créé avec succès", userId: user.id },
       { status: 201 }
     )
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: "Erreur serveur" },
       { status: 500 }

@@ -1,9 +1,51 @@
 "use client";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function Register() {
+  const router = useRouter();
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    setError("");
+
+    if (password !== confirm) {
+      setError("Les mots de passe ne correspondent pas");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, email, password }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error || "Une erreur est survenue");
+        return;
+      }
+
+      router.push("/login");
+    } catch {
+      setError("Une erreur est survenue");
+    } finally {
+      setLoading(false);
+    }
+  }
 
   return (
     <div className="min-h-screen flex flex-col items-center px-4 pt-16 pb-12">
@@ -12,7 +54,15 @@ export default function Register() {
           Créer un compte
         </h1>
       </div>
-      <div className="w-full max-w-lg bg-white border border-gray-200 rounded-2xl px-8 py-8">
+      <form
+        onSubmit={handleSubmit}
+        className="w-full max-w-lg bg-white border border-gray-200 rounded-2xl px-8 py-8"
+      >
+        {error && (
+          <p className="mb-5 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-3">
+            {error}
+          </p>
+        )}
         <div className="mb-5">
           <label className="block text-sm text-gray-700 mb-2">
             Nom d'utilisateur
@@ -20,16 +70,20 @@ export default function Register() {
           <input
             type="text"
             placeholder="Nom d'utilisateur"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            required
             className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 placeholder-gray-400 outline-none focus:border-violet-500 transition-colors bg-white"
           />
         </div>
         <div className="mb-5">
-          <label className="block text-sm text-gray-700 mb-2">
-            Email
-          </label>
+          <label className="block text-sm text-gray-700 mb-2">Email</label>
           <input
             type="email"
             placeholder="exemple@domaine.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
             className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 placeholder-gray-400 outline-none focus:border-violet-500 transition-colors bg-white"
           />
         </div>
@@ -41,9 +95,13 @@ export default function Register() {
             <input
               type={showPassword ? "text" : "password"}
               placeholder="••••••••••"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
               className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 placeholder-gray-400 outline-none focus:border-violet-500 transition-colors pr-12 bg-white"
             />
             <button
+              type="button"
               onClick={() => setShowPassword(!showPassword)}
               className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
               aria-label={showPassword ? "Masquer" : "Afficher"}
@@ -69,9 +127,13 @@ export default function Register() {
             <input
               type={showConfirm ? "text" : "password"}
               placeholder="••••••••••"
+              value={confirm}
+              onChange={(e) => setConfirm(e.target.value)}
+              required
               className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 placeholder-gray-400 outline-none focus:border-violet-500 transition-colors pr-12 bg-white"
             />
             <button
+              type="button"
               onClick={() => setShowConfirm(!showConfirm)}
               className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
               aria-label={showConfirm ? "Masquer" : "Afficher"}
@@ -89,25 +151,26 @@ export default function Register() {
             </button>
           </div>
         </div>
-        <button className="w-full flex items-center justify-center gap-2 bg-violet-700 hover:bg-violet-800 transition-colors text-white font-semibold text-sm py-3.5 rounded-xl mb-7">
-          Créer mon compte
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-          </svg>
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full flex items-center justify-center gap-2 bg-violet-700 hover:bg-violet-800 disabled:opacity-60 transition-colors text-white font-semibold text-sm py-3.5 rounded-xl mb-7"
+        >
+          {loading ? "Création…" : "Créer mon compte"}
+          {!loading && (
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+            </svg>
+          )}
         </button>
-
-        {/* Séparateur */}
         <div className="border-t border-gray-200 mb-7" />
-
-        {/* Déjà un compte */}
         <p className="text-center text-sm text-gray-400 italic">
           Déjà un compte ?{" "}
-          <a href="/login" className="text-violet-600 hover:text-violet-700 transition-colors not-italic font-medium">
+          <Link href="/login" className="text-violet-600 hover:text-violet-700 transition-colors not-italic font-medium">
             Se connecter
-          </a>
+          </Link>
         </p>
-
-      </div>
+      </form>
     </div>
   );
 }

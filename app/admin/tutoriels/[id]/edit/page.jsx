@@ -1,26 +1,14 @@
-export default function EditTutoriel( {params} ) {
-    return (
-        <>
-            <h1>Modifier le tutoriel {params.id}</h1>
-            <form>
-                <div>
-                    <label htmlFor="title">Titre</label>
-                    <input type="text" id="title" name="title" required />
-                </div>
-                <div>
-                    <label htmlFor="category">Catégorie</label>
-                    <input type="text" id="category" name="category" required />
-                </div>
-                <div>
-                    <label htmlFor="difficulty">Difficulté</label>
-                    <input type="text" id="difficulty" name="difficulty" required />
-                </div>
-                <div>
-                    <label htmlFor="content">Contenu</label>
-                    <textarea id="content" name="content" required></textarea>
-                </div>
-                <button type="submit">Enregistrer les modifications</button>
-            </form>
-        </>
-    )
+import { notFound } from "next/navigation";
+import { prisma } from "@/lib/prisma";
+import TutorielForm from "@/components/admin/TutorielForm";
+
+export default async function EditTutoriel({ params }) {
+  const { id } = await params;
+  const numId = parseInt(id, 10);
+  if (isNaN(numId)) notFound();
+
+  const tutoriel = await prisma.tutoriel.findUnique({ where: { id: numId } });
+  if (!tutoriel) notFound();
+
+  return <TutorielForm initialData={tutoriel} />;
 }

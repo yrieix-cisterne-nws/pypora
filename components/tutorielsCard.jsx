@@ -4,6 +4,8 @@ const difficultyConfig = {
   Avancé:        "text-rose-500",
 };
 
+import Link from "next/link";
+
 export default function TutorielsCard({ title, slug, category, difficulty, description}) {
   const diffColor = difficultyConfig[difficulty] ?? "text-gray-500";
 
@@ -23,11 +25,9 @@ export default function TutorielsCard({ title, slug, category, difficulty, descr
           {description && <p className="text-sm text-gray-500 leading-relaxed line-clamp-3">{description}</p>}
         </div>
         <div className="flex items-center justify-between pt-2 border-t border-gray-100">
-          <a href={`/tutoriels/${slug}`} className="text-violet-700 hover:text-violet-900 transition-colors" aria-label={`Voir ${title}`}>
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-            </svg>
-          </a>
+          <Link href={`/tutoriels/${slug}`} className="text-violet-700 hover:text-violet-900 transition-colors" aria-label={`Voir ${title}`}>
+            <p>Accéder au tutoriel</p>
+          </Link>
         </div>
 
       </div>

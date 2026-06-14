@@ -1,12 +1,10 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
-import { verifyToken } from "@/lib/jwt"
 import { tutorielSchema } from "@/lib/validations/tutoriels"
-import { cookies } from "next/headers"
+import { getPayload } from "@/lib/auth"
 
 async function requireAdmin() {
-  const token = (await cookies()).get("token")?.value
-  const payload = token ? await verifyToken(token) : null
+  const payload = await getPayload()
   return payload?.role === "admin" ? payload : null
 }
 
@@ -21,8 +19,14 @@ export async function GET(
       return NextResponse.json({ error: "ID invalide" }, { status: 400 })
     }
 
+    const payload = await getPayload()
+    const isAdmin = payload?.role === "admin"
+
     const tutoriel = await prisma.tutoriel.findUnique({
-      where: { id: numId },
+      where: {
+        id: numId,
+        ...(!isAdmin ? { published: true } : {}),
+      },
       include: { categorie: true },
     })
 

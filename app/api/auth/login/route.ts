@@ -3,9 +3,18 @@ import { prisma } from "@/lib/prisma"
 import { comparePassword } from "@/lib/bcrypt"
 import { signToken } from "@/lib/jwt"
 import { loginSchema } from "@/lib/validations/auth"
+import { checkRateLimit } from "@/lib/rateLimit"
 
 export async function POST(req: Request) {
   try {
+    const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown"
+    if (!checkRateLimit(`login:${ip}`, 10, 60_000)) {
+      return NextResponse.json(
+        { error: "Trop de tentatives. Réessayez dans une minute." },
+        { status: 429 }
+      )
+    }
+
     const body = await req.json()
     const result = loginSchema.safeParse(body)
     if (!result.success) {
@@ -25,15 +34,15 @@ export async function POST(req: Request) {
       )
     }
 
-    const valid = await comparePassword(password, user.password)
-    if (!valid) {
+    const passwordMatch = await comparePassword(password, user.password)
+    if (!passwordMatch) {
       return NextResponse.json(
         { error: "Email ou mot de passe incorrect" },
         { status: 401 }
       )
     }
 
-    const token = await signToken({ userId: user.id, email: user.email, role: user.role })
+    const token = await signToken({ userId: user.id, username: user.username, email: user.email, role: user.role })
 
     const response = NextResponse.json(
       { message: "Connexion réussie", userId: user.id },
@@ -48,10 +57,7 @@ export async function POST(req: Request) {
     })
 
     return response
-  } catch (error) {
-    return NextResponse.json(
-      { error: "Erreur serveur" },
-      { status: 500 }
-    )
+  } catch {
+    return NextResponse.json({ error: "Erreur serveur" }, { status: 500 })
   }
 }

@@ -1,26 +1,5 @@
+import TutorielForm from "@/components/admin/TutorielForm";
+
 export default function NouveauTutoriel() {
-    return (
-        <>
-            <h1>Créer un nouveau tutoriel</h1>
-            <form>
-                <div>
-                    <label htmlFor="title">Titre</label>
-                    <input type="text" id="title" name="title" required />
-                </div> 
-                <div>
-                    <label htmlFor="category">Catégorie</label>
-                    <input type="text" id="category" name="category" required />
-                </div>
-                <div>
-                    <label htmlFor="difficulty">Difficulté</label>
-                    <input type="text" id="difficulty" name="difficulty" required />
-                </div>
-                <div>
-                    <label htmlFor="content">Contenu</label>
-                    <textarea id="content" name="content" required></textarea>
-                </div>
-                <button type="submit">Créer</button>
-            </form>
-        </>
-    )
+  return <TutorielForm />;
 }
